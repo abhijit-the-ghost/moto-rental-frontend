@@ -19,6 +19,7 @@ const ImageCard = () => {
               <div className="badge badge-outline">Model</div>
               <div className="badge badge-outline">Milage</div>
             </div>
+            <button className="btn btn-primary">Rent Now</button>
           </div>
         </div>
       </div>

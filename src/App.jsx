@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/login";
 import Register from "./pages/Register";
 import BookingBikes from "./pages/BookingBikes";
-import BikeDetails from "./pages/BikeDetails";
+// import BikeDetails from "./pages/BikeDetails";
 import Profile from "./pages/profile";
 
 const App = () => {
@@ -15,9 +15,8 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/booking-bikes" element={<BookingBikes />} />
-          <Route path="/bike-detail" element={<BikeDetails />} />
+          {/* <Route path="/bike-detail" element={<BikeDetails />} /> */}
           <Route path="/profile" element={<Profile />} />
-          
         </Routes>
       </BrowserRouter>
     </>
