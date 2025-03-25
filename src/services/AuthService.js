@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL; // Get API base URL from .env
-
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 const AuthService = {
   // ✅ SIGNUP FUNCTION
   signup: async (userData) => {
@@ -49,13 +52,34 @@ const AuthService = {
     return !!localStorage.getItem("token");
   },
 
-  // ✅ FETCH CURRENT USER DATA (Example Protected Route)
+  updateUserProfile: async (updatedUser) => {
+    try {
+      const response = await axios.patch(
+        `${BASE_URL}users/update`,
+        updatedUser,
+        {
+          headers: {
+            ...getAuthHeaders(),
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      return {
+        error: error.response?.data?.message || "Profile update failed",
+      };
+    }
+  },
+
+  // FETCH CURRENT USER DATA
   getUserProfile: async () => {
     try {
       const token = AuthService.getAuthToken();
       if (!token) throw new Error("No token found");
 
-      const response = await axios.get(`${BASE_URL}auth/profile`, {
+      const response = await axios.get(`${BASE_URL}users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -23,7 +23,9 @@ const Login = () => {
       setError(response.error);
     } else {
       alert("Login Successful!");
-      navigate("/dashboard"); // Redirect user to dashboard after login
+      navigate("/"); // Redirect user to dashboard after login
+      AuthService.getUserProfile();
+      window.reload();
     }
 
     setLoading(false);

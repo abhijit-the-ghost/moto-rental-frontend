@@ -1,23 +1,21 @@
-const ImageCard = () => {
+const ImageCard = (props) => {
+  const { name, description, image, price, company, status } = props;
   return (
     <>
       <div>
-        <div className="card bg-base-100 w-96 shadow-sm">
+        <div className="card bg-base-100 w-80 shadow-sm">
           <figure>
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-              alt="Shoes"
-            />
+            <img src={image} alt="Shoes" />
           </figure>
           <div className="card-body">
             <h2 className="card-title">
-              Motorcycle Name
-              <div className="badge badge-secondary">Company</div>
+              {name}
+              <div className="badge badge-secondary">{company}</div>
             </h2>
-            <p>A little description</p>
+            <p>{description}</p>
             <div className="card-actions justify-end">
-              <div className="badge badge-outline">Model</div>
-              <div className="badge badge-outline">Milage</div>
+              <div className="badge badge-outline">{price}</div>
+              <div className="badge badge-outline">{status}</div>
             </div>
             <button className="btn btn-primary">Rent Now</button>
           </div>

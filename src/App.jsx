@@ -1,25 +1,34 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Register from "./pages/Register";
-import BookingBikes from "./pages/BookingBikes";
-// import BikeDetails from "./pages/BikeDetails";
-import Profile from "./pages/profile";
+import Profile from "./pages/Profile";
+import AboutUs from "./pages/AboutUs";
+import OurMotorcycles from "./pages/OurMotorcycles";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/booking-bikes" element={<BookingBikes />} />
-          {/* <Route path="/bike-detail" element={<BikeDetails />} /> */}
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/our-motorcycles" element={<OurMotorcycles />} />
+
+        {/* Protected Routes (Only Logged-in Users) */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
