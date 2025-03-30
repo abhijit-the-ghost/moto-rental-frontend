@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import DefaultLayout from "../components/DefaultLayout";
 import AuthService from "../services/AuthService";
+import RentalService from "../services/RentalServices";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -47,6 +48,29 @@ const Profile = () => {
       setDrivingLicense(file);
     } else if (type === "passport") {
       setPassport(file);
+    }
+  };
+
+  const handleReturn = async (rentalId) => {
+    if (!window.confirm("Are you sure you want to return this motorcycle?")) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await RentalService.returnMotorcycle(rentalId); // Assuming this method exists
+      if (response.success) {
+        // Update UI: refetch user data or filter out the returned motorcycle
+        await fetchUserProfile();
+        alert("Motorcycle returned successfully!");
+      } else {
+        console.log(response.error || "Failed to return motorcycle");
+      }
+    } catch (err) {
+      // setError("An error occurred while returning the motorcycle");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,12 +172,14 @@ const Profile = () => {
                 >
                   <img
                     src={`http://localhost:5000${moto.image}`}
-                    alt={moto.name}
+                    alt={moto.motorcycle.name}
                     className="w-full h-40 object-cover rounded"
                   />
                   <div className="mt-3">
-                    <h3 className="text-lg font-bold">{moto.name}</h3>
-                    <p className="text-gray-500">{moto.company}</p>
+                    <h3 className="text-lg font-bold">
+                      {moto.motorcycle.name}
+                    </h3>
+                    <p className="text-gray-500">{moto.motorcycle.company}</p>
                     <p className="text-gray-700">
                       Status:{" "}
                       <span
@@ -167,8 +193,18 @@ const Profile = () => {
                       </span>
                     </p>
                     <p className="text-gray-600">
-                      Rent Duration: {moto.rentDuration} days
+                      Rent Start Date: {moto.rentStartDate.split("T")[0]}
                     </p>
+                    <p className="text-gray-600">
+                      Rent End Date: {moto.rentEndDate.split("T")[0]}
+                    </p>
+                    <button
+                      className="btn btn-sm btn-primary mt-3"
+                      onClick={() => handleReturn(moto._id)}
+                      disabled={moto.status !== "Rented"}
+                    >
+                      Return Motorcycle
+                    </button>
                   </div>
                 </div>
               ))}
@@ -222,26 +258,6 @@ const Profile = () => {
                   value={updatedUser?.dob ? updatedUser.dob.split("T")[0] : ""}
                   onChange={handleChange}
                 />
-
-                {/* Driving License Upload */}
-                <label className="label mt-2">Upload Driving License</label>
-                <input
-                  type="file"
-                  className="file-input file-input-bordered w-full"
-                  onChange={(e) => handleFileChange(e, "license")}
-                />
-
-                {/* Passport Upload (Only for Foreigners) */}
-                {updatedUser?.isForeigner && (
-                  <>
-                    <label className="label mt-2">Upload Passport</label>
-                    <input
-                      type="file"
-                      className="file-input file-input-bordered w-full"
-                      onChange={(e) => handleFileChange(e, "passport")}
-                    />
-                  </>
-                )}
 
                 <div className="flex justify-between mt-4">
                   <button

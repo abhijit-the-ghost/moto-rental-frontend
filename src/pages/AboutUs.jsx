@@ -19,9 +19,7 @@ const AboutUs = () => {
           // }}
         >
           <div className=" text-center">
-            <h1 className="text-4xl md:text-5xl font-bold">
-              About Moto Rentals
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold">Moto Rentals</h1>
             <p className="text-lg md:text-xl mt-4">
               Your Trusted Motorcycle Rental Service
             </p>
@@ -88,49 +86,8 @@ const AboutUs = () => {
           </div>
         </section>
 
-        {/* ✅ Meet Our Team (Optional) */}
-        <section className="py-16 bg-gray-100">
-          <div className="container mx-auto px-6 text-center">
-            <h2 className="text-3xl font-bold text-gray-800">Meet Our Team</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-              {/* Team Member 1 */}
-              <div className="card bg-white shadow-lg p-6">
-                <img
-                  className="w-24 h-24 rounded-full mx-auto"
-                  src="https://source.unsplash.com/100x100/?man,face"
-                  alt="Team Member"
-                />
-                <h3 className="text-xl font-bold mt-4">John Doe</h3>
-                <p className="text-gray-600">Founder & CEO</p>
-              </div>
-
-              {/* Team Member 2 */}
-              <div className="card bg-white shadow-lg p-6">
-                <img
-                  className="w-24 h-24 rounded-full mx-auto"
-                  src="https://source.unsplash.com/100x100/?woman,face"
-                  alt="Team Member"
-                />
-                <h3 className="text-xl font-bold mt-4">Jane Smith</h3>
-                <p className="text-gray-600">Operations Manager</p>
-              </div>
-
-              {/* Team Member 3 */}
-              <div className="card bg-white shadow-lg p-6">
-                <img
-                  className="w-24 h-24 rounded-full mx-auto"
-                  src="https://source.unsplash.com/100x100/?man,beard"
-                  alt="Team Member"
-                />
-                <h3 className="text-xl font-bold mt-4">Mike Johnson</h3>
-                <p className="text-gray-600">Customer Relations</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* ✅ Call to Action */}
-        <section className="py-16 bg-primary text-white text-center">
+        <section className="py-16 bg-base-200 text-base-content text-center">
           <h2 className="text-3xl font-bold">Ready to Ride?</h2>
           <p className="mt-4">Explore the best motorcycles for rent today!</p>
           <button className="btn btn-secondary mt-6">Rent a Motorcycle</button>

@@ -1,11 +1,10 @@
 import { useState } from "react";
-import AuthService from "../services/AuthService"; // Import AuthService
-import { useNavigate } from "react-router-dom"; // For redirection
+import AuthService from "../services/AuthService";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  // State for form fields
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -13,38 +12,43 @@ const Register = () => {
     password: "",
     repeatPassword: "",
     dob: "",
+    phoneNumber: "",
     isForeigner: false,
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Handle Input Change
+  // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value, // Convert checkbox to boolean
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  // Handle Form Submission
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    // ✅ Send data as JSON since there are no files
-    const response = await AuthService.signup(formData);
+    try {
+      const response = await AuthService.signup(formData); // Send as JSON
 
-    if (response.error) {
-      setError(response.error);
-    } else {
-      alert("Registration Successful! Redirecting to login...");
-      navigate("/login"); // Redirect to login page
+      if (response.error) {
+        setError(response.error);
+      } else {
+        alert("Registration Successful! Redirecting to login...");
+        navigate("/login");
+      }
+    } catch (error) {
+      setError("An error occurred during registration.");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -57,21 +61,33 @@ const Register = () => {
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
 
         <form className="mt-6" onSubmit={handleSubmit}>
-          {/* First Name & Last Name */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* First Name */}
+          <div className="mt-4">
+            <label htmlFor="firstName" className="block mb-2">
+              First Name
+            </label>
             <input
               type="text"
+              id="firstName"
               name="firstName"
-              placeholder="First Name"
+              placeholder="Enter your first name"
               className="input input-bordered w-full"
               value={formData.firstName}
               onChange={handleChange}
               required
             />
+          </div>
+
+          {/* Last Name */}
+          <div className="mt-4">
+            <label htmlFor="lastName" className="block mb-2">
+              Last Name
+            </label>
             <input
               type="text"
+              id="lastName"
               name="lastName"
-              placeholder="Last Name"
+              placeholder="Enter your last name"
               className="input input-bordered w-full"
               value={formData.lastName}
               onChange={handleChange}
@@ -80,57 +96,103 @@ const Register = () => {
           </div>
 
           {/* Email */}
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter your email"
-            className="input input-bordered w-full mt-4"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <div className="mt-4">
+            <label htmlFor="email" className="block mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              className="input input-bordered w-full"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          {/* Password & Confirm Password */}
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="input input-bordered w-full mt-4"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="password"
-            name="repeatPassword"
-            placeholder="Confirm Password"
-            className="input input-bordered w-full mt-4"
-            value={formData.repeatPassword}
-            onChange={handleChange}
-            required
-          />
+          {/* Password */}
+          <div className="mt-4">
+            <label htmlFor="password" className="block mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              className="input input-bordered w-full"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* Confirm Password */}
+          <div className="mt-4">
+            <label htmlFor="repeatPassword" className="block mb-2">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="repeatPassword"
+              name="repeatPassword"
+              placeholder="Confirm your password"
+              className="input input-bordered w-full"
+              value={formData.repeatPassword}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
           {/* Date of Birth */}
-          <input
-            type="date"
-            name="dob"
-            className="input input-bordered w-full mt-4"
-            value={formData.dob}
-            onChange={handleChange}
-            required
-          />
+          <div className="mt-4">
+            <label htmlFor="dob" className="block mb-2">
+              Date of Birth
+            </label>
+            <input
+              type="date"
+              id="dob"
+              name="dob"
+              className="input input-bordered w-full"
+              value={formData.dob}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div className="mt-4">
+            <label htmlFor="phoneNumber" className="block mb-2">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              placeholder="Enter your phone number"
+              className="input input-bordered w-full"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
           {/* Foreigner Checkbox */}
-          <label className="cursor-pointer label mt-4">
-            <span className="label-text">Are you a Foreigner?</span>
-            <input
-              type="checkbox"
-              name="isForeigner"
-              className="checkbox checkbox-primary"
-              checked={formData.isForeigner}
-              onChange={handleChange}
-            />
-          </label>
+          <div className="mt-4">
+            <label htmlFor="isForeigner" className="cursor-pointer label">
+              <span className="label-text">Are you a Foreigner?</span>
+              <input
+                type="checkbox"
+                id="isForeigner"
+                name="isForeigner"
+                className="checkbox checkbox-primary"
+                checked={formData.isForeigner}
+                onChange={handleChange}
+              />
+            </label>
+          </div>
 
           {/* Submit Button */}
           <button
