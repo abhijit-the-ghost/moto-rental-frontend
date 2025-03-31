@@ -136,29 +136,29 @@ const ImageCard = ({
 
   return (
     <>
-      <div className="card bg-base-100 w-80 shadow-sm">
-        <figure>
-          <img
-            src={`http://localhost:5000${image}`}
-            alt={name}
-            className="bg-contain h-52 w-full"
-          />
-        </figure>
-        <div className="card-body">
-          <h2 className="card-title">
-            {name}
-            <div className="badge badge-secondary">{company}</div>
-          </h2>
-          <p className="text-start">{description}</p>
-          <div className="card-actions justify-end">
-            <div className="badge badge-outline">${price}/day</div>
-            <div className="badge badge-outline">{status}</div>
-          </div>
-          <button className="btn btn-primary" onClick={handleOpenModal}>
-            Rent Now
-          </button>
+      {/* <div className="card bg-base-100 w-80 shadow-sm"> */}
+      <figure>
+        <img
+          src={`http://localhost:5000${image}`}
+          alt={name}
+          className="bg-contain h-52 w-full"
+        />
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">
+          {name}
+          <div className="badge badge-secondary">{company}</div>
+        </h2>
+        <p className="text-start">{description}</p>
+        <div className="card-actions justify-end">
+          <div className="badge badge-outline">${price}/day</div>
+          <div className="badge badge-outline">{status}</div>
         </div>
+        <button className="btn btn-primary" onClick={handleOpenModal}>
+          Rent Now
+        </button>
       </div>
+      {/* </div> */}
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-brightness-50">
