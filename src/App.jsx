@@ -6,6 +6,7 @@ import Profile from "./pages/Profile";
 import AboutUs from "./pages/AboutUs";
 import OurMotorcycles from "./pages/OurMotorcycles";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Contact from "./pages/Contact";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/our-motorcycles" element={<OurMotorcycles />} />
+        <Route path="/contact-us" element={<Contact />} />
 
         {/* Protected Routes (Only Logged-in Users) */}
         <Route

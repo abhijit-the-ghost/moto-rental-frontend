@@ -20,9 +20,9 @@ const ImageCard = ({
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [dateError, setDateError] = useState("");
 
-  console.log(startDate, endDate, "dates");
-  // Effect to check if the user is logged in
+  // Check authentication status
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -33,17 +33,34 @@ const ImageCard = ({
     }
   }, []);
 
-  // Effect to calculate the total amount based on start and end dates
+  // Calculate total amount and validate dates
   useEffect(() => {
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      if (end > start) {
-        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        setTotalAmount(days * price);
-      } else {
-        setTotalAmount(0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize today to midnight
+
+      // Reset errors and total amount
+      setDateError("");
+      setTotalAmount(0);
+
+      // Validation checks
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        setDateError("Please select valid dates.");
+        return;
       }
+      if (start < today) {
+        setDateError("Start date cannot be in the past.");
+        return;
+      }
+      if (end <= start) {
+        setDateError("End date must be after start date.");
+        return;
+      }
+
+      const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      setTotalAmount(days * price);
     }
   }, [startDate, endDate, price]);
 
@@ -55,50 +72,47 @@ const ImageCard = ({
     } catch (error) {
       console.error("Error fetching user data:", error);
       setIsLoggedIn(false);
+      localStorage.removeItem("token"); // Clear invalid token
     }
   };
 
-  // Open modal to rent motorcycle
+  // Open modal with pre-checks
   const handleOpenModal = () => {
     if (!isLoggedIn) {
       alert("Please log in to rent a motorcycle.");
       navigate("/login");
       return;
     }
-
-    if (status === "Available") {
-      setIsModalOpen(true);
-    } else {
-      alert("This motorcycle is not available for rent.");
+    if (!userData?.verified) {
+      alert("Your account must be verified to rent a motorcycle.");
+      navigate("/profile"); // Redirect to profile for verification
+      return;
     }
+    if (status !== "Available") {
+      alert("This motorcycle is currently unavailable.");
+      return;
+    }
+    setIsModalOpen(true);
   };
 
-  // Close modal
+  // Close modal and reset form
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setStartDate("");
     setEndDate("");
     setTotalAmount(0);
+    setDateError("");
   };
 
-  // Rent the motorcycle
-  // In ImageCard.jsx
+  // Handle rental submission
   const handleRent = async () => {
     if (!startDate || !endDate) {
-      alert("Please select both start and end dates.");
+      setDateError("Please select both start and end dates.");
       return;
     }
 
-    const parsedStartDate = new Date(startDate);
-    const parsedEndDate = new Date(endDate);
-
-    if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
-      alert("Invalid date selected.");
-      return;
-    }
-
-    if (parsedEndDate <= parsedStartDate) {
-      alert("End date must be after start date.");
+    if (dateError) {
+      alert(dateError);
       return;
     }
 
@@ -113,96 +127,151 @@ const ImageCard = ({
 
       const response = await RentalService.rentMotorcycle(
         uuid,
-        parsedStartDate,
-        parsedEndDate
+        new Date(startDate),
+        new Date(endDate)
       );
 
       if (response?.success) {
         alert(
-          "Please visit MotoRentals, Balaju, Kathmandu to take your rented motorcycle."
+          "Rental confirmed! Please visit MotoRentals, Balaju, Kathmandu to pick up your motorcycle."
         );
         handleCloseModal();
-        // Optionally, refresh the motorcycle list or user data here
+        // Optionally trigger a parent refresh if provided
       } else {
-        alert(response.error || "Failed to rent motorcycle.");
+        alert(response.error || "Failed to process rental request.");
       }
     } catch (error) {
-      alert("An error occurred while processing your rental request.");
-      console.error(error);
+      alert(
+        "An error occurred while processing your rental. Please try again."
+      );
+      console.error("Rental error:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
-      {/* <div className="card bg-base-100 w-80 shadow-sm"> */}
+    <div className="card bg-white shadow-lg rounded-xl overflow-hidden transition-all hover:shadow-xl">
       <figure>
         <img
-          src={`http://localhost:5000${image}`}
+          src={
+            image.startsWith("http") ? image : `http://localhost:5000${image}`
+          }
           alt={name}
-          className="bg-contain h-52 w-full"
+          className="h-52 w-full object-fill"
         />
       </figure>
-      <div className="card-body">
-        <h2 className="card-title">
+      <div className="card-body p-4">
+        <h2 className="card-title text-xl font-bold text-gray-800">
           {name}
-          <div className="badge badge-secondary">{company}</div>
+          <div className="badge badge-secondary ml-2">{company}</div>
         </h2>
-        <p className="text-start">{description}</p>
-        <div className="card-actions justify-end">
-          <div className="badge badge-outline">${price}/day</div>
-          <div className="badge badge-outline">{status}</div>
+        <p className="text-gray-600 text-sm">{description}</p>
+        <div className="card-actions justify-between items-center mt-4">
+          <div className="flex gap-2">
+            <div className="badge badge-outline badge-lg">${price}/day</div>
+            <div
+              className={`badge badge-lg ${
+                status === "Available" ? "badge-success" : "badge-error"
+              }`}
+            >
+              {status}
+            </div>
+          </div>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleOpenModal}
+            disabled={loading}
+          >
+            Rent Now
+          </button>
         </div>
-        <button className="btn btn-primary" onClick={handleOpenModal}>
-          Rent Now
-        </button>
       </div>
-      {/* </div> */}
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center backdrop-brightness-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Rent {name}</h2>
-            <label className="block mb-2">Start Date:</label>
-            <input
-              type="date"
-              className="input input-bordered w-full mb-4"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-
-            <label className="block mb-2">End Date:</label>
-            <input
-              type="date"
-              className="input input-bordered w-full mb-4"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-
-            <p className="mb-4">
-              Total Amount: <span className="font-bold">${totalAmount}</span>
-            </p>
-
-            <div className="flex justify-end">
+        <div className="fixed inset-0 flex items-center justify-center backdrop-brightness-50 z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Rent {name}
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  className="input input-bordered w-full focus:ring-2 focus:ring-blue-500"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]} // Prevent past dates
+                  disabled={loading}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  className="input input-bordered w-full focus:ring-2 focus:ring-blue-500"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  min={startDate || new Date().toISOString().split("T")[0]}
+                  disabled={loading}
+                  required
+                />
+              </div>
+              {dateError && <p className="text-red-500 text-sm">{dateError}</p>}
+              <p className="text-gray-700">
+                Total Amount:{" "}
+                <span className="font-bold text-green-600">
+                  ${totalAmount.toLocaleString()}
+                </span>
+              </p>
+            </div>
+            <div className="flex gap-4 mt-6">
               <button
-                className="btn btn-secondary mr-2"
+                className="btn btn-outline btn-error flex-1"
                 onClick={handleCloseModal}
+                disabled={loading}
               >
                 Cancel
               </button>
               <button
-                className="btn btn-success"
+                className="btn btn-success flex-1"
                 onClick={handleRent}
-                disabled={loading || totalAmount <= 0}
+                disabled={loading || totalAmount <= 0 || dateError}
               >
-                {loading ? "Processing..." : "Confirm Rental"}
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  "Confirm Rental"
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
